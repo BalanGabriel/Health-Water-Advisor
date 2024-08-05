@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenAI GPT Integration</title>
+    <title>Ask OpenAI GPT</title>
 </head>
 <body>
     <h1>Ask OpenAI GPT</h1>
@@ -23,7 +23,7 @@
             responseDiv.innerHTML = 'Loading...';
 
             try {
-                const response = await fetch('/ask', {
+                const response = await fetch('https://YOUR-HEROKU-APP-NAME.herokuapp.com/ask', {  // Actualizați URL-ul
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

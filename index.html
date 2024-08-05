@@ -3,46 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health & Water Advisor</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>OpenAI GPT Integration</title>
 </head>
 <body>
-    <div id="chat-container">
-        <h2>Health & Water Advisor</h2>
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="Enter your question...">
-        <button id="send-button">Send</button>
-    </div>
+    <h1>Ask OpenAI GPT</h1>
+    <form id="question-form">
+        <label for="question">Enter your question:</label>
+        <input type="text" id="question" name="question" required>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="response"></div>
 
     <script>
-        $(document).ready(function() {
-            $('#send-button').click(function() {
-                var userInput = $('#user-input').val();
-                $('#chat-box').append('<p><strong>You:</strong> ' + userInput + '</p>');
-                $('#user-input').val('');
-                
-                $.ajax({
-                    url: 'https://api.openai.com/v1/engines/davinci-codex/completions',
-                    type: 'POST',
+        document.getElementById('question-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const question = document.getElementById('question').value;
+
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = 'Loading...';
+
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer you_api_key',  // Înlocuiți cu cheia dvs. API
                         'Content-Type': 'application/json'
                     },
-                    data: JSON.stringify({
-                        'prompt': userInput,
-                        'max_tokens': 150
-                    }),
-                    success: function(response) {
-                        console.log('Response:', response);  // Debugging: verificați răspunsul în consolă
-                        var botResponse = response.choices[0].text;
-                        $('#chat-box').append('<p><strong>Advisor:</strong> ' + botResponse + '</p>');
-                    },
-                    error: function(jqXHR, textStatus, errorThrown) {
-                        console.log('Error:', textStatus, errorThrown);  // Debugging: verificați erorile în consolă
-                        $('#chat-box').append('<p><strong>Advisor:</strong> There was an error processing your request.</p>');
-                    }
+                    body: JSON.stringify({ question })
                 });
-            });
+                const data = await response.json();
+                responseDiv.innerHTML = data.answer;
+            } catch (error) {
+                responseDiv.innerHTML = 'An error occurred: ' + error.message;
+            }
         });
     </script>
 </body>

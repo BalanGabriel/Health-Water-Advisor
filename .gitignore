@@ -1,6 +1,63 @@
-"node_modules/" 
-".env" 
-"AppData/" 
-"Temp/" 
-"Local Settings/" 
-"My Documents/" 
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Environment
+.env
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+*.log
+*.pot
+*.pyc
+
+# Directories
+AppData/
+.cache/
+.gitconfig
+.lesshst
+.qd/
+3D Objects/
+Contacts/
+Desktop/
+Documents/
+Downloads/
+Favorites/
+Links/
+Music/
+NTUSER.DAT*
+OneDrive/
+Pictures/
+Saved Games/
+Searches/
+Tracing/
+Videos/
+netrc
+myenv/
+myenvScriptsactivate.bat/
+python

@@ -1,5 +1,5 @@
 import express from 'express';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
@@ -42,3 +42,4 @@ app.post('/api/proxy', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+

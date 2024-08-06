@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { OpenAI } from 'openai';
+import OpenAI from 'openai';
 
 const app = express();
 const port = process.env.PORT || 3000;

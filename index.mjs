@@ -1,15 +1,13 @@
 import express from 'express';
 import cors from 'cors';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';  // Verifică documentația pentru versiunea instalată
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 app.use(cors());
 app.use(express.json());
@@ -21,13 +19,13 @@ app.post('/ask', async (req, res) => {
   }
 
   try {
-    const response = await openai.createCompletion({
+    const response = await openai.completions.create({
       model: "text-davinci-003",
       prompt: question,
       max_tokens: 100,
     });
 
-    const answer = response.data.choices[0].text.trim();
+    const answer = response.choices[0].text.trim();
     res.json({ answer });
   } catch (error) {
     console.error('Error from OpenAI:', error);

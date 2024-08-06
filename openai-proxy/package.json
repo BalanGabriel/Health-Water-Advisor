@@ -2,10 +2,11 @@
   "name": "openai-proxy",
   "version": "1.0.0",
   "description": "A proxy server for OpenAI API",
-  "main": "index.js",
+  "main": "index.mjs",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.mjs"
   },
+  "type": "module",
   "dependencies": {
     "express": "^4.17.1",
     "body-parser": "^1.19.0",

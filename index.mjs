@@ -5,14 +5,13 @@ import { Configuration, OpenAIApi } from 'openai';
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configurarea CORS
 app.use(cors({
   origin: 'https://balangabriel.github.io'
 }));
 
 app.use(express.json());
 
-// Configurarea OpenAI
+// OpenAI configuration
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -34,7 +33,7 @@ app.post('/ask', async (req, res) => {
 
     res.json({ answer: response.data.choices[0].text.trim() });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 });
 

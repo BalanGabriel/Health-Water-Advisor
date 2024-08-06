@@ -1,36 +1,35 @@
 import express from 'express';
 import cors from 'cors';
-import { Configuration, OpenAIApi } from 'openai';
+import { OpenAI } from 'openai';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-const openai = new OpenAIApi(configuration);
+app.use(cors());
+app.use(express.json());
 
 app.post('/ask', async (req, res) => {
-  const { question } = req.body;
-
+  const question = req.body.question;
   if (!question) {
     return res.status(400).json({ error: 'Question is required' });
   }
 
   try {
-    const response = await openai.createCompletion({
-      model: 'text-davinci-003',
+    const response = await openai.completions.create({
+      model: "text-davinci-003",
       prompt: question,
       max_tokens: 100,
     });
 
-    res.json({ answer: response.data.choices[0].text.trim() });
+    const answer = response.choices[0].text.trim();
+    res.json({ answer });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error from OpenAI:', error);
+    res.status(500).json({ error: 'Failed to get response from OpenAI' });
   }
 });
 

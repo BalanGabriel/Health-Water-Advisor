@@ -1,13 +1,15 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import openai from 'openai';
-import cors from 'cors'; // Importă CORS
+import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: 'https://balangabriel.github.io' })); // Configurează CORS pentru a permite cererile de la domeniul specific
+// Configurează CORS pentru a permite cererile de la domeniul specific
+app.use(cors({ origin: 'https://balangabriel.github.io' }));
 app.options('*', cors()); // Enable pre-flight (OPTIONS) requests for all routes
+
 app.use(bodyParser.json());
 
 openai.apiKey = process.env.OPENAI_API_KEY;

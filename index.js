@@ -1,18 +1,28 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const bodyParser = require('body-parser');
+const openai = require('openai');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+openai.apiKey = process.env.OPENAI_API_KEY;
+
+app.post('/chat', async (req, res) => {
+  const prompt = req.body.prompt;
+
+  try {
+    const response = await openai.Completion.create({
+      engine: 'text-davinci-003',
+      prompt: prompt,
+      max_tokens: 150,
+    });
+
+    res.json({ response: response.choices[0].text });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.listen(port, () => {

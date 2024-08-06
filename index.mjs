@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -9,8 +9,8 @@ app.use(cors());
 app.use(express.json());
 
 const openai = new OpenAI({
-  organization: process.env.OPENAI_ORGANIZATION,
   apiKey: process.env.OPENAI_API_KEY,
+  organization: process.env.OPENAI_ORGANIZATION,
 });
 
 app.post('/ask', async (req, res) => {

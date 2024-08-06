@@ -1,19 +1,21 @@
 import express from 'express';
 import cors from 'cors';
-import OpenAI from 'openai';  // Verifică documentația pentru versiunea instalată
+import OpenAI from 'openai';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 app.use(cors());
 app.use(express.json());
 
+const openai = new OpenAI({
+  organization: process.env.OPENAI_ORGANIZATION,
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 app.post('/ask', async (req, res) => {
-  const question = req.body.question;
+  const { question } = req.body;
+
   if (!question) {
     return res.status(400).json({ error: 'Question is required' });
   }
@@ -25,11 +27,9 @@ app.post('/ask', async (req, res) => {
       max_tokens: 100,
     });
 
-    const answer = response.choices[0].text.trim();
-    res.json({ answer });
+    res.json({ answer: response.choices[0].text.trim() });
   } catch (error) {
-    console.error('Error from OpenAI:', error);
-    res.status(500).json({ error: 'Failed to get response from OpenAI' });
+    res.status(500).json({ error: error.message });
   }
 });
 

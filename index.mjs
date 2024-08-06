@@ -1,38 +1,21 @@
-import express from 'express';
-import cors from 'cors';
 import OpenAI from 'openai';
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.json());
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  organization: process.env.OPENAI_ORGANIZATION,
+// Crearea clientului OpenAI folosind cheia din variabilele de mediu
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // Accesarea cheii API din variabilele de mediu
 });
 
-app.post('/ask', async (req, res) => {
-  const { question } = req.body;
-
-  if (!question) {
-    return res.status(400).json({ error: 'Question is required' });
-  }
-
+// Exemplu de utilizare a completărilor de chat
+async function main() {
   try {
-    const response = await openai.completions.create({
-      model: "text-davinci-003",
-      prompt: question,
-      max_tokens: 100,
+    const chatCompletion = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: 'Say this is a test' }],
     });
-
-    res.json({ answer: response.choices[0].text.trim() });
+    console.log(chatCompletion);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error:', error);
   }
-});
+}
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+main();

@@ -1,41 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ask OpenAI GPT</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask OpenAI GPT</title>
 </head>
 <body>
-    <h1>Ask OpenAI GPT</h1>
-    <form id="question-form">
-        <label for="question">Enter your question:</label>
-        <input type="text" id="question" name="question" required>
-        <button type="submit">Submit</button>
-    </form>
-    <div id="response"></div>
+  <h1>Ask OpenAI GPT</h1>
+  <form id="ask-form">
+    <label for="question">Enter your question:</label>
+    <input type="text" id="question" name="question" required>
+    <button type="submit">Submit</button>
+  </form>
+  <div id="response"></div>
 
-    <script>
-        document.getElementById('question-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const question = document.getElementById('question').value;
-
-            const responseDiv = document.getElementById('response');
-            responseDiv.innerHTML = 'Loading...';
-
-            try {
-                const response = await fetch('https://YOUR-HEROKU-APP-NAME.herokuapp.com/ask', {  // Actualizați URL-ul
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ question })
-                });
-                const data = await response.json();
-                responseDiv.innerHTML = data.answer;
-            } catch (error) {
-                responseDiv.innerHTML = 'An error occurred: ' + error.message;
-            }
-        });
-    </script>
-</body>
-</html>
+  <script>
+    document.getElementById('ask-form').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const ques

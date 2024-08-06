@@ -1,21 +1,44 @@
-import OpenAI from 'openai';
+import express from 'express';
+import { Configuration, OpenAIApi } from 'openai';
+import cors from 'cors';
+import bodyParser from 'body-parser';
 
-// Crearea clientului OpenAI folosind cheia din variabilele de mediu
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Accesarea cheii API din variabilele de mediu
+// Configurare Express
+const app = express();
+const port = process.env.PORT || 3000;
+
+// Configurare CORS și body-parser
+app.use(cors());
+app.use(bodyParser.json());
+
+// Configurare OpenAI
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+// Endpoint pentru proxy
+app.post('/api/proxy', async (req, res) => {
+  try {
+    const { prompt, model } = req.body;
+
+    if (!prompt || !model) {
+      return res.status(400).json({ error: 'Prompt and model are required' });
+    }
+
+    const response = await openai.createCompletion({
+      model: model,
+      prompt: prompt,
+      max_tokens: 100,
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-// Exemplu de utilizare a completărilor de chat
-async function main() {
-  try {
-    const chatCompletion = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: 'Say this is a test' }],
-    });
-    console.log(chatCompletion);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-main();
+// Pornire server
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});

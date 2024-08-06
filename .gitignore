@@ -1,7 +1,2 @@
-"node_modules/" 
-".env" 
-"AppData/" 
-"Temp/" 
-"Local Settings/" 
-"My Documents/" 
-".env" 
+node_modules/
+.env

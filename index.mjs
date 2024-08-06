@@ -1,6 +1,6 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const openai = require('openai');
+import express from 'express';
+import bodyParser from 'body-parser';
+import openai from 'openai';
 
 const app = express();
 const port = process.env.PORT || 3000;

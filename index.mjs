@@ -8,7 +8,6 @@ const port = process.env.PORT || 3000;
 app.use(cors({
   origin: 'https://balangabriel.github.io'
 }));
-
 app.use(express.json());
 
 // OpenAI configuration
@@ -30,7 +29,6 @@ app.post('/ask', async (req, res) => {
       prompt: question,
       max_tokens: 100,
     });
-
     res.json({ answer: response.data.choices[0].text.trim() });
   } catch (error) {
     res.status(500).json({ error: 'Something went wrong' });

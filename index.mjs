@@ -1,38 +1,44 @@
 import express from 'express';
+import OpenAI from 'openai';
 import cors from 'cors';
-import OpenAI from 'openai';  // Verifică documentația pentru versiunea instalată
+import bodyParser from 'body-parser';
 
+// Configurare Express
 const app = express();
 const port = process.env.PORT || 3000;
 
-const openai = new OpenAI({
+// Configurare CORS și body-parser
+app.use(cors());
+app.use(bodyParser.json());
+
+// Configurare OpenAI
+const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
+const openai = new OpenAIApi(configuration);
 
-app.use(cors());
-app.use(express.json());
-
-app.post('/ask', async (req, res) => {
-  const question = req.body.question;
-  if (!question) {
-    return res.status(400).json({ error: 'Question is required' });
-  }
-
+// Endpoint pentru proxy
+app.post('/api/proxy', async (req, res) => {
   try {
-    const response = await openai.completions.create({
-      model: "text-davinci-003",
-      prompt: question,
+    const { prompt, model } = req.body;
+
+    if (!prompt || !model) {
+      return res.status(400).json({ error: 'Prompt and model are required' });
+    }
+
+    const response = await openai.createCompletion({
+      model: model,
+      prompt: prompt,
       max_tokens: 100,
     });
 
-    const answer = response.choices[0].text.trim();
-    res.json({ answer });
+    res.json(response.data);
   } catch (error) {
-    console.error('Error from OpenAI:', error);
-    res.status(500).json({ error: 'Failed to get response from OpenAI' });
+    res.status(500).json({ error: error.message });
   }
 });
 
+// Pornire server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

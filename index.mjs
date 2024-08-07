@@ -1,44 +1,31 @@
+import cors from 'cors';
 import express from 'express';
 import OpenAI from 'openai';
-import cors from 'cors';
-import bodyParser from 'body-parser';
 
-// Configurare Express
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configurare CORS și body-parser
+// Utilizează CORS
 app.use(cors());
-app.use(bodyParser.json());
 
-// Configurare OpenAI
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
-// Endpoint pentru proxy
-app.post('/api/proxy', async (req, res) => {
+app.use(express.json());
+
+app.post('/chat', async (req, res) => {
   try {
-    const { prompt, model } = req.body;
-
-    if (!prompt || !model) {
-      return res.status(400).json({ error: 'Prompt and model are required' });
-    }
-
-    const response = await openai.createCompletion({
-      model: model,
-      prompt: prompt,
-      max_tokens: 100,
+    const chatCompletion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: req.body.message }],
     });
-
-    res.json(response.data);
+    res.json(chatCompletion);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).send(error.message);
   }
 });
 
-// Pornire server
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });

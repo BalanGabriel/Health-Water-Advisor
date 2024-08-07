@@ -14,6 +14,12 @@ const openai = new OpenAI({
 
 app.use(express.json());
 
+// Endpoint pentru verificare
+app.get('/', (req, res) => {
+  res.send('Server is running');
+});
+
+// Endpoint pentru chat
 app.post('/chat', async (req, res) => {
   try {
     const chatCompletion = await openai.chat.completions.create({

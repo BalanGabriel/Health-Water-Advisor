@@ -1,6 +1,6 @@
 import cors from 'cors';
 import express from 'express';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -8,10 +8,9 @@ const port = process.env.PORT || 3000;
 // Utilizează CORS și permite toate originile
 app.use(cors());
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 app.use(express.json());
 
@@ -45,12 +44,12 @@ app.post('/chat', async (req, res) => {
       `
     };
 
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [systemMessage, { role: 'user', content: userMessage }],
     });
 
-    res.json(response.data);
+    res.json(response);
   } catch (error) {
     res.status(500).send(error.message);
   }

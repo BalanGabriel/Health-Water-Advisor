@@ -45,12 +45,12 @@ app.post('/chat', async (req, res) => {
       `
     };
 
-    const chatCompletion = await openai.createChatCompletion({
+    const response = await openai.createChatCompletion({
       model: 'gpt-4o-mini',
       messages: [systemMessage, { role: 'user', content: userMessage }],
     });
 
-    res.json(chatCompletion.data);
+    res.json(response.data);
   } catch (error) {
     res.status(500).send(error.message);
   }

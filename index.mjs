@@ -5,7 +5,7 @@ import OpenAI from 'openai';
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Utilizează CORS
+// Utilizează CORS și permite toate originile
 app.use(cors());
 
 const openai = new OpenAI({
@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 app.post('/chat', async (req, res) => {
   try {
     const chatCompletion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Folosește modelul corect
+      model: 'gpt-4o-mini',
       messages: [{ role: 'user', content: req.body.message }],
     });
     res.json(chatCompletion);

@@ -1,6 +1,9 @@
 import cors from 'cors';
 import express from 'express';
+import multer from 'multer';
 import OpenAI from 'openai';
+import xlsx from 'xlsx';
+import path from 'path';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,6 +17,16 @@ const openai = new OpenAI({
 
 app.use(express.json());
 
+// Încarcă fișierul Excel 'Database.xlsx' la pornirea aplicației
+const workbook = xlsx.readFile(path.join(__dirname, 'Database.xlsx'));
+const sheetName = workbook.SheetNames[0];  // Preia numele primei foi din Excel
+const data = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+
+// Funcție pentru a găsi informații din Excel pe baza unei condiții
+function findInfo(condition) {
+  return data.find(row => row.Condition.toLowerCase() === condition.toLowerCase());
+}
+
 // Endpoint pentru verificare
 app.get('/', (req, res) => {
   res.send('Server is running');
@@ -24,7 +37,16 @@ app.post('/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
 
-    // Mesajul de tip "system" pentru a seta instrucțiunile personalizate
+    // Caută informații în Excel pe baza mesajului utilizatorului
+    const info = findInfo(userMessage);
+
+    let responseMessage;
+    if (info) {
+      responseMessage = `Based on your condition (${info.Condition}), I recommend the following water: ${info.Recommendation}.`;
+    } else {
+      responseMessage = "I'm sorry, I couldn't find information for that condition.";
+    }
+
     const systemMessage = {
       role: "system",
       content: `
@@ -46,7 +68,7 @@ app.post('/chat', async (req, res) => {
 
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [systemMessage, { role: 'user', content: userMessage }],
+      messages: [systemMessage, { role: 'user', content: responseMessage }],
     });
 
     res.json(response);

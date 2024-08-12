@@ -20,40 +20,52 @@ const openai = new OpenAI({
 
 app.use(express.json());
 
-// Răspunde cererilor OPTIONS (preflight)
-app.options('*', cors());
+// Citește fișierul Excel la pornirea serverului
+const filePath = path.resolve('data', 'Database.xlsx'); // Modifică calea dacă este necesar
+let excelData = [];
 
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
+try {
+  const workbook = XLSX.readFile(filePath);
+  const sheetName = workbook.SheetNames[0]; // Folosește primul sheet
+  const sheet = workbook.Sheets[sheetName];
+  excelData = XLSX.utils.sheet_to_json(sheet);
+  console.log('Excel data loaded:', excelData);
+} catch (error) {
+  console.error('Error reading Excel file:', error.message);
+}
 
+// Endpoint pentru chat
 app.post('/chat', async (req, res) => {
   try {
-    const userMessage = req.body.message;
+    const userMessage = req.body.message.toLowerCase();
 
-    // Citește fișierul Excel
-    const filePath = path.resolve('data', 'Database.xlsx'); // Modifică calea după cum este necesar
-    const workbook = XLSX.readFile(filePath);
-    const sheetName = workbook.SheetNames[0]; // Ia primul sheet
-    const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet);
-
-    // Procesare date (exemplu)
-    console.log(data);
+    // Verifică dacă mesajul cere date specifice din Excel
+    if (userMessage.includes('aqua carpatica')) {
+      const aquaCarpaticaData = excelData.find(row => row.Brand.toLowerCase() === 'aqua carpatica');
+      if (aquaCarpaticaData) {
+        res.json({ answer: `Datele pentru Aqua Carpatica:\n${JSON.stringify(aquaCarpaticaData, null, 2)}` });
+        return;
+      }
+    }
 
     // Mesajul de tip "system" pentru a seta instrucțiunile personalizate
     const systemMessage = {
       role: "system",
       content: `
         You are Health & Water Advisor. Welcome! I can help you choose the best water to drink based on your health needs, with a focus on Romanian water brands. Just tell me your condition, and I'll provide recommendations and detailed information.
-        // Restul mesajului...
+
+        Examples of requests:
+        - "I have hypertension. What water do you recommend?"
+        - "What is the best water for athletes?"
+        - "Can I drink this water if I have kidney issues?"
+        - "I want to know more about the water brand X."
       `
     };
 
     // Folosește modelul 'gpt-4o-mini'
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
-      messages: [systemMessage, { role: 'user', content: userMessage }],
+      messages: [systemMessage, { role: 'user', content: req.body.message }],
     });
 
     res.json(response);

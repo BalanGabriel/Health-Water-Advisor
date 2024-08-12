@@ -1,13 +1,15 @@
 import cors from 'cors';
 import express from 'express';
 import OpenAI from 'openai';
+import XLSX from 'xlsx';
+import path from 'path';
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configurare CORS pentru a permite cereri de la specificația originilor
+// Configurare CORS
 app.use(cors({
-  origin: 'https://balangabriel.github.io', // Specifică frontend-ul tău
+  origin: 'https://balangabriel.github.io',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -29,35 +31,34 @@ app.post('/chat', async (req, res) => {
   try {
     const userMessage = req.body.message;
 
+    // Citește fișierul Excel
+    const filePath = path.resolve('data', 'Database.xlsx'); // Modifică calea după cum este necesar
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0]; // Ia primul sheet
+    const sheet = workbook.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(sheet);
+
+    // Procesare date (exemplu)
+    console.log(data);
+
     // Mesajul de tip "system" pentru a seta instrucțiunile personalizate
     const systemMessage = {
       role: "system",
       content: `
         You are Health & Water Advisor. Welcome! I can help you choose the best water to drink based on your health needs, with a focus on Romanian water brands. Just tell me your condition, and I'll provide recommendations and detailed information.
-
-        Role and Objective: This AI provides personalized water recommendations based on the user's specified health conditions. It ranks Romanian water brands from best to worst and explains the reasoning behind the recommendations. It also displays detailed data for each water brand, addressing data gaps by estimating values based on available data for the same brand.
-        Constraints: Ensure that the AI does not provide medical advice, but only general recommendations. Manage data gaps by using statistical methods to estimate values based on other available data points for the same brand.
-        Guidelines: Respond to user inputs with specific and detailed recommendations and explanations. Display data for the selected water brand, highlighting key factors relevant to the user's health condition.
-        Clarification: Ask for clarification if the user's input is ambiguous or incomplete.
-        Personalization: Use a friendly and informative tone to make recommendations accessible and engaging.
-
-        Examples of requests:
-        - "I have hypertension. What water do you recommend?"
-        - "What is the best water for athletes?"
-        - "Can I drink this water if I have kidney issues?"
-        - "I want to know more about the water brand X."
+        // Restul mesajului...
       `
     };
 
     // Folosește modelul 'gpt-4o-mini'
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini', // Modelul specificat
+      model: 'gpt-4o-mini',
       messages: [systemMessage, { role: 'user', content: userMessage }],
     });
 
     res.json(response);
   } catch (error) {
-    console.error('Error:', error.message); // Adaugă logare pentru debugging
+    console.error('Error:', error.message);
     res.status(500).send('An error occurred: ' + error.message);
   }
 });

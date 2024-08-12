@@ -21,7 +21,7 @@ const openai = new OpenAI({
 app.use(express.json());
 
 // Citește fișierul Excel la pornirea serverului
-const filePath = path.resolve('data', 'Database.xlsx'); // Modifică calea dacă este necesar
+const filePath = path.resolve('Database.xlsx'); // Modifică calea dacă este necesar
 let excelData = [];
 
 try {
@@ -78,3 +78,4 @@ app.post('/chat', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+

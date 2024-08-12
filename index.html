@@ -33,7 +33,8 @@
         }
         
         const data = await response.json();
-        document.getElementById('response').innerText = data.answer;
+        const answer = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+        document.getElementById('response').innerText = answer || 'No answer found';
       } catch (error) {
         document.getElementById('response').innerText = 'An error occurred: ' + error.message;
       }

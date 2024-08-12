@@ -21,14 +21,14 @@ const openai = new OpenAI({
 app.use(express.json());
 
 // Citește fișierul Excel la pornirea serverului
-const filePath = path.resolve('Database.xlsx'); // Asigură-te că fișierul este în rădăcina proiectului
+const filePath = path.resolve('Database.xlsx');
 let excelData = [];
 
 try {
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0]; // Folosește primul sheet
   const sheet = workbook.Sheets[sheetName];
-  excelData = XLSX.utils.sheet_to_json(sheet);
+  excelData = XLSX.utils.sheet_to_json(sheet); // Convertim foaia Excel într-un array de obiecte JSON
   console.log('Excel data loaded:', excelData);
 } catch (error) {
   console.error('Error reading Excel file:', error.message);
@@ -39,30 +39,31 @@ app.post('/chat', async (req, res) => {
   try {
     const userMessage = req.body.message.toLowerCase();
 
-    // Verifică dacă mesajul cere date specifice din Excel
-    if (userMessage.includes('aqua carpatica')) {
-      const aquaCarpaticaData = excelData.find(row => row.Brand.toLowerCase() === 'aqua carpatica');
-      if (aquaCarpaticaData) {
-        res.json({ answer: `Datele pentru Aqua Carpatica:\n${JSON.stringify(aquaCarpaticaData, null, 2)}` });
-        return;
+    // Verifică dacă utilizatorul cere o listă detaliată de branduri din Excel
+    if (userMessage.includes('lista') && userMessage.includes('branduri') && userMessage.includes('detaliata')) {
+      const detailedList = excelData.map(row => {
+        return Object.entries(row).map(([key, value]) => `${key}: ${value || 'N/A'}`).join('\n');
+      }).join('\n\n');
+
+      if (detailedList.length > 0) {
+        res.json({ answer: `Iată o listă detaliată de branduri disponibile în baza de date:\n${detailedList}` });
+      } else {
+        res.json({ answer: 'Nu am găsit branduri în baza de date.' });
       }
+      return;
     }
 
-    // Mesajul de tip "system" pentru a seta instrucțiunile personalizate
+    // Logica pentru alte întrebări
+    // ...
+
+    // Codul pentru OpenAI fallback
     const systemMessage = {
       role: "system",
       content: `
         You are Health & Water Advisor. Welcome! I can help you choose the best water to drink based on your health needs, with a focus on Romanian water brands. Just tell me your condition, and I'll provide recommendations and detailed information.
-
-        Examples of requests:
-        - "I have hypertension. What water do you recommend?"
-        - "What is the best water for athletes?"
-        - "Can I drink this water if I have kidney issues?"
-        - "I want to know more about the water brand X."
       `
     };
 
-    // Folosește modelul 'gpt-4o-mini'
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [systemMessage, { role: 'user', content: req.body.message }],
